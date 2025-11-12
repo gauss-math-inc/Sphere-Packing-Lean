@@ -521,12 +521,10 @@ by
   set g : ℕ → ℂ := fun n => (1 - cexp (2 * π * Complex.I * (n + 1) * (Complex.I * t))) ^ 24
   have hArg (n : ℕ) :
       2 * (π : ℂ) * Complex.I * (n + 1) * (Complex.I * t) = -(2 * (π : ℂ) * (n + 1) * t) := by
-    have : Complex.I * (Complex.I : ℂ) = (-1 : ℂ) := by simp
     calc
       2 * (π : ℂ) * Complex.I * (n + 1) * (Complex.I * t)
-          = 2 * (π : ℂ) * (Complex.I * Complex.I) * (n + 1) * t := by ring
-      _ = 2 * (π : ℂ) * (-1) * (n + 1) * t := by simp [this]
-      _ = -(2 * (π : ℂ) * (n + 1) * t) := by ring
+        = 2 * (π : ℂ) * (Complex.I * Complex.I) * (n + 1) * t := by ring
+      _ = -(2 * (π : ℂ) * (n + 1) * t) := by simp
   have him_g : ∀ n, (g n).im = 0 := fun n => by
     have : (cexp (-(2 * (π : ℂ) * ((n + 1) : ℂ) * t))).im = 0 := by
       simpa [mul_comm, mul_left_comm, mul_assoc] using (cexp_aux4 t n)
