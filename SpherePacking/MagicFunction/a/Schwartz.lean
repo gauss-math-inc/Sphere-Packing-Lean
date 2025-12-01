@@ -63,8 +63,18 @@ theorem I₃'_smooth' : ContDiff ℝ ∞ RealIntegrals.I₃' := by
 theorem I₄'_smooth' : ContDiff ℝ ∞ RealIntegrals.I₄' := by
   sorry
 
-theorem I₅'_smooth' : ContDiff ℝ ∞ RealIntegrals.I₅' := by
-  sorry
+theorem I₅'_smooth' : ContDiff ℝ ∞ RealIntegrals.I₅' :=
+by
+  have hI : RealIntegrals.I₅' = fun x : ℝ => (-2 : ℂ) * cexp (π * I * x) * RealIntegrals.I₁' x := by
+    ext r; set K := ∫ t in (0 : ℝ)..1, φ₀'' (-1 / (I * t)) * t ^ 2 * cexp (-π * r * t) with hK
+    have : I₁' r = -I * cexp (-π * I * r) * K := by
+      simpa [mul_assoc] using (I₁'_eq' r).trans (congrArg (-I * ·) (by simp [hK, mul_comm, mul_left_comm] :
+        ∫ t in (0 : ℝ)..1, φ₀'' (-1 / (I * t)) * t ^ 2 * cexp (-π * I * r) * cexp (-π * r * t) = cexp (-π * I * r) * K))
+    simp only [(by simpa [hK] using I₅'_eq' r : I₅' r = 2 * I * K), this, mul_comm, mul_left_comm, mul_assoc]
+    ring_nf; simp [Complex.exp_neg]
+  have h : ContDiff ℝ ∞ fun x : ℝ => (-2 : ℂ) * (cexp (π * I * x) * I₁' x) :=
+    contDiff_const.mul ((contDiff_const.mul ofRealCLM.contDiff).cexp.mul I₁'_smooth')
+  simpa [hI, mul_comm, mul_left_comm, mul_assoc] using h
 
 theorem I₆'_smooth' : ContDiff ℝ ∞ RealIntegrals.I₆' := by
   sorry

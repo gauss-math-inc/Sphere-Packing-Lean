@@ -46,8 +46,25 @@ theorem J₁'_smooth' : ContDiff ℝ ∞ RealIntegrals.J₁' := by
 theorem J₂'_smooth' : ContDiff ℝ ∞ RealIntegrals.J₂' := by
   sorry
 
-theorem J₃'_smooth' : ContDiff ℝ ∞ RealIntegrals.J₃' := by
-  sorry
+theorem J₃'_smooth' : ContDiff ℝ ∞ RealIntegrals.J₃' :=
+by
+  have hP : ∀ w : UpperHalfPlane, ψT ((2 : ℝ) +ᵥ w) = ψT w := fun w => by
+    have h : ∀ w', ψT ((1 : ℝ) +ᵥ w') = ψI w' := fun w' => by simpa [modular_slash_T_apply] using congrArg (· w') ψT_slash_T
+    simpa [(by ext; simp [UpperHalfPlane.coe_vadd]; ring : (1 : ℝ) +ᵥ ((1 : ℝ) +ᵥ w) = (2 : ℝ) +ᵥ w),
+      (by simp [ψT, modular_slash_T_apply] : ψT w = ψI ((1 : ℝ) +ᵥ w)).symm] using h ((1 : ℝ) +ᵥ w)
+  suffices hJ : RealIntegrals.J₃' = fun x : ℝ => cexp (2 * π * I * x) * RealIntegrals.J₁' x by simpa [hJ] using (contDiff_const.mul ofRealCLM.contDiff).cexp.mul J₁'_smooth'
+  ext x; refine (intervalIntegral.integral_congr (f := fun t => cexp (2 * π * I * x) * (I * ψT' (z₁' t) * cexp (π * I * x * z₁' t))) fun t ht => ?_).symm.trans (by simp [RealIntegrals.J₁', mul_comm, mul_left_comm, mul_assoc])
+  rw [uIcc_of_le (by norm_num : (0 : ℝ) ≤ 1)] at ht
+  have h1 := z₁'_eq_of_mem ht; have h3 := z₃'_eq_of_mem ht; have hz : z₃' t = z₁' t + 2 := by simp only [h1, h3]; ring
+  have hψ : ψT' (z₃' t) = ψT' (z₁' t) := by
+    rcases eq_or_ne t 0 with rfl | ht0
+    · simp [ψT', z₁'_eq_of_mem (by simp : (0 : ℝ) ∈ Icc 0 1), z₃'_eq_of_mem (by simp : (0 : ℝ) ∈ Icc 0 1)]
+    have hp := ht.1.lt_of_ne' ht0
+    have i1 : 0 < (z₁' t).im := by simp [h1, hp]
+    have i3 : 0 < (z₃' t).im := by simp [h3, hp]
+    simp only [ψT', i1, i3, dif_pos]
+    simpa [(by ext; simp [UpperHalfPlane.coe_vadd, hz, add_comm] : ((2 : ℝ) +ᵥ ⟨z₁' t, i1⟩ : UpperHalfPlane) = ⟨z₃' t, i3⟩)] using hP ⟨z₁' t, i1⟩
+  simp [hz, hz ▸ hψ, mul_add, Complex.exp_add, mul_comm, mul_left_comm, mul_assoc]
 
 theorem J₄'_smooth' : ContDiff ℝ ∞ RealIntegrals.J₄' := by
   sorry
